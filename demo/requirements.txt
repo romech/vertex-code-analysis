@@ -28,6 +28,7 @@ Pympler==1.0.1
 python-dateutil==2.8.2
 pytz==2023.3
 pytz-deprecation-shim==0.1.0.post0
+ratelimit==2.2.1
 referencing==0.29.1
 requests==2.31.0
 rich==13.4.2
