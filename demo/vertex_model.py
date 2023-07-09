@@ -56,3 +56,10 @@ def _insert_linenum(source_str):
     lines = source_str.split('\n')
     lines = [f'line {i}:\t{line}' for i, line in enumerate(lines, 1)]
     return '\n'.join(lines)
+
+
+# def dummy_llm_query(prompt):
+#     time.sleep(0.3)
+#     comments = [random.choice(['# too short', '# too long', '# too complicated', '# nice'])
+#                 for line in prompt.split('\n')]
+#     return '\n'.join(comments)

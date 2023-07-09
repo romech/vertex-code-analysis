@@ -8,16 +8,16 @@ instructions: >
     1. Provide Python coding suggestions that are described in a human-readable
     language.
     
-    2. For each line of code please provide the following JSON field of suggestion:
+    2. Please format your response in JSON format. Each suggestion must be in the following format:
     
     {
         "code_line_num": [int, which line of code the suggestion is dedicated to]
     
-        "replacement_code": [string; Python code to replace the given line]
+        "replacement_code": [string; Python code to improve and replace the given line.]
 
-        "explanation": [string, optional; a suggestion that a programmer is supposed to read to improve the code. Preferably one sentence long. Remember to fence quote characters for a valid JSON.]
+        "explanation": [string, optional; a suggestion that a programmer is supposed to read to improve the code. Preferably one sentence long. Remember to fence quote characters for a valid JSON, or use singular 'quotes'. If the replacement_code is self-explanatory, pass null value here.]
     
-        "confidence": [float; confidence score in range of [0, 1] displaying your confidence that your suggestion is useful] 
+        "confidence": [float; confidence score in range of [0, 1] displaying your confidence that your suggestion is useful and correct] 
     
         "suggestion_class_number": [integer; improvement regarding: 0- code performance or program; 1: code quality; 2: style or convention compliance; 3: warning for bug / bad practice; 4: error / bug fix; 5: other]
     }

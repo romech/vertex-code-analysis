@@ -3,6 +3,7 @@ import logging
 import random
 import time
 from operator import itemgetter
+from typing import List, Tuple
 
 import streamlit as st
 import toolz
@@ -24,12 +25,6 @@ def update_ai_suggestions(text):
                language=language,
                readonly=True,
                auto_update=True)
-        
-# def dummy_llm_query(prompt):
-#     time.sleep(0.3)
-#     comments = [random.choice(['# too short', '# too long', '# too complicated', '# nice'])
-#                 for line in prompt.split('\n')]
-#     return '\n'.join(comments)
 
 
 @st.cache_resource
@@ -63,9 +58,9 @@ class Assistant:
         self._update_output_widget(response)
     
     @limits(calls=10, period=1, raise_on_limit=False)
-    def query_llm(self, user_code):
+    def query_llm(self, user_code) -> Tuple[str, List[dict]]:
         if user_code == '':
-            return ''
+            return '', []
         chat = self.model.start_chat(
             context=vertex_model.get_context_prompt(),
             **vertex_model.PROMPT_PARAMETERS)
@@ -84,18 +79,14 @@ class Assistant:
                                    {response_text}
                                    ```
                                    """)
-            return '...'
+            return '...', []
             
         suggestions = self._parse_response(user_code, response)
         return suggestions
 
     def _parse_response(self, user_code: str, response: dict) -> str:
         total_lines = user_code.count('\n') + 1
-        comments = [''] * total_lines
         get_confidence = itemgetter('confidence')
-        # filtered_suggestions = [block
-        #                         for block in response
-        #                         if block['confidence'] >= 0.8]
         suggestions_per_line = toolz.groupby('code_line_num', response)
         best_suggestion_per_line = toolz.valmap(lambda b: max(b, key=get_confidence),
                                                 suggestions_per_line)
@@ -104,39 +95,65 @@ class Assistant:
         ranked_suggestions = sorted(best_suggestion_per_line.values(),
                                     key=get_confidence)
         
+        comments = [''] * total_lines
+        notifications = []
         for block in ranked_suggestions:
             line_num = block['code_line_num'] - 1
             if line_num >= total_lines:
                 logging.warning(f'line {line_num} is out of range')
                 last_status.write('Encountered invalid line number')
                 continue
-            if comments[line_num] != '':
-                # overlapping suggestion
+            suggestion = block.get('replacement_code', '')
+            
+            # checking for multi-line overlaps
+            suggestion_lines = suggestion.split('\n')
+            if any(comments[line_num + offset] != ''
+                   for offset in range(len(suggestion_lines))):
+                # found overlapping suggestion
                 continue
-            suggestion = block['replacement_code']
-            comments[line_num] = suggestion
-            explanation = block.get('explanation')
+            
+            for i, line in enumerate(suggestion_lines, line_num):
+                comments[i] = line
+            
+            explanation = block.get('explanation', '')
+            notifications.append({
+                "row": line_num,
+                "column": 0,
+                "text": explanation,
+                "type": self._parse_suggestion_type(block)
+            })
             if explanation:
                 if line_num > 0 and comments[line_num - 1] == '':
                     comments[line_num - 1] = f'# {explanation}'
-                else:
-                    comments[line_num] += f'  # {explanation}'
-        return '\n'.join(comments)
+            #     else:
+            #         comments[line_num] += f'  # {explanation}'
+        return '\n'.join(comments), notifications
     
-    def _update_output_widget(self, text):
-        # st.session_state['last_suggestion'] = text
+    def _update_output_widget(self, suggestions):
         logging.debug('updating response')
+        text, notifications = suggestions
         with ai_code_placeholder:
             st.session_state['last_response'] = text
             st_ace(value=text,
                    language=language,
                    readonly=True,
-                   auto_update=True)
-
+                   auto_update=True,
+                   annotations=notifications)
+            
     def _cache_reponse(self, user_code, response):
         hist = st.session_state['query_history']
         hist[user_code] = response
         st.session_state['query_history'] = hist
+    
+    @classmethod
+    def _parse_suggestion_type(cls, suggestion_block):
+        match suggestion_block['suggestion_class_number']:
+            case 3:
+                return 'warning'
+            case 4:
+                return 'error'
+            case _:
+                return 'info'
 
 
 assistant = Assistant()
