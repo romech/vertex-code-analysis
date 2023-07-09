@@ -95,7 +95,8 @@ class Assistant:
         best_suggestion_per_line = toolz.valfilter(lambda b: get_confidence(b) >= 0.8,
                                                    best_suggestion_per_line)
         ranked_suggestions = sorted(best_suggestion_per_line.values(),
-                                    key=get_confidence)
+                                    key=get_confidence,
+                                    reverse=True)
         
         comments = [''] * total_lines
         notifications = []
@@ -105,7 +106,7 @@ class Assistant:
                 logging.warning(f'line {line_num} is out of range')
                 last_status.write('Encountered invalid line number')
                 continue
-            suggestion = block.get('replacement_code', '')
+            suggestion = block.get('replacement_code', '').strip('\n')
             
             # checking for multi-line overlaps
             suggestion_lines = suggestion.split('\n')
