@@ -207,7 +207,7 @@ editor_side, ai_side = st.columns([0.5, 0.5])
 
 
 with ai_side:
-    st.write('AI suggestions will apear here')
+    st.write('AI suggestions will appear here')
     ai_code_placeholder = st.empty()
     with ai_code_placeholder:
         st_ace(
