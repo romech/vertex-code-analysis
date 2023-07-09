@@ -90,14 +90,16 @@ class Assistant:
             
         return suggestions
 
-    def _parse_response(self, user_code: str, response: dict) -> str:
+    def _parse_response(self, user_code: str, response: list) -> str:
         total_lines = user_code.count('\n') + 1
         get_confidence = itemgetter('confidence')
         suggestions_per_line = toolz.groupby('code_line_num', response)
-        best_suggestion_per_line = toolz.valmap(lambda b: max(b, key=get_confidence),
-                                                suggestions_per_line)
-        best_suggestion_per_line = toolz.valfilter(lambda b: get_confidence(b) >= 0.8,
-                                                   best_suggestion_per_line)
+        best_suggestion_per_line = toolz.valmap(
+            lambda b: max(b, key=get_confidence),
+            suggestions_per_line)
+        best_suggestion_per_line = toolz.valfilter(
+            lambda b: get_confidence(b) >= vertex_model.CONFIDENCE_THRESHOLD,
+            best_suggestion_per_line)
         ranked_suggestions = sorted(best_suggestion_per_line.values(),
                                     key=get_confidence,
                                     reverse=True)

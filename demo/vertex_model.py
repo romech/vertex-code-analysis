@@ -19,6 +19,7 @@ PROMPT_PARAMETERS = {
     "top_p": 1.0,
     "top_k": 40,
 }
+CONFIDENCE_THRESHOLD = 0.8
 
 def _initialize_credentials(credentials=None):
     if credentials is None:
