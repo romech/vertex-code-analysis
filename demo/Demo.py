@@ -1,7 +1,6 @@
 import json
 import logging
-import random
-import time
+from pathlib import Path
 from operator import itemgetter
 from typing import List, Tuple
 
@@ -19,6 +18,14 @@ st.set_page_config(
     layout="wide",
 )
 
+
+@st.cache_data
+def get_code_examples():
+    example_paths = sorted((Path(__file__).parent / 'poor_code_examples').glob('*.py'))
+    examples = {'blank': ''}
+    examples.update({path.stem: path.read_text() for path in example_paths})
+    return examples
+    
 
 @st.cache_resource
 def get_model():
@@ -101,8 +108,11 @@ class Assistant:
                 continue
             suggestion = block.get('replacement_code', '').strip('\n')
             
-            # checking for multi-line overlaps
             suggestion_lines = suggestion.split('\n')
+            # checking if the suggestion is longer than the input
+            if (extra_lines := len(suggestion_lines) + line_num - total_lines) > 0:
+                comments += [''] * (extra_lines)
+            # checking for multi-line overlaps
             if any(comments[line_num + offset] != ''
                    for offset in range(len(suggestion_lines))):
                 # found overlapping suggestion
@@ -111,7 +121,7 @@ class Assistant:
             for i, line in enumerate(suggestion_lines, line_num):
                 comments[i] = line
             
-            explanation = block.get('explanation', '')
+            explanation = block.get('explanation', '').replace('\n',' ')
             notifications.append({
                 "row": line_num,
                 "column": 0,
@@ -160,6 +170,11 @@ assistant = Assistant()
 st.write("# Welcome to Vertex Code Analyser! 👋")
 
 with st.sidebar:
+    st.image('https://developers.google.com/static/focus/images/palm-logo.svg', width=128)
+    code_examples = get_code_examples()
+    code_example_name = st.selectbox(label='Try out examples',
+                                     options=code_examples.keys())
+    
     language = st.selectbox(label='Language',
                             options=['python', 'js', 'go', 'java', 'sql', 'ts'],
                             disabled=True)
@@ -182,10 +197,11 @@ with ai_side:
 
 with editor_side:
     st.write('Try out your code:')
-    user_code = st_ace(language=language,
+    user_code = st_ace(value=code_examples[code_example_name],
+                       language=language,
                        auto_update=auto_suggest,
                        max_lines=300,
-                       key='user_code')
+                       key=f'user_code_{code_example_name}')
 
 with st.expander('Debug info'):
     last_status = st.empty()
