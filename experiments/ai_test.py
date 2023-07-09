@@ -164,6 +164,11 @@ parameters = {
 #code_chat_model = CodeChatModel.from_pretrained("chat-bison")
 #chat = code_chat_model.start_chat()
 
+# import yaml
+
+# with open('prompt.yaml', 'w') as f:
+#     yaml.dump(initialization_prompt, f, indent=4, sort_keys=False,)
+    
 chat_model = ChatModel.from_pretrained("chat-bison")
 chat = chat_model.start_chat(
     context=json.dumps(initialization_prompt)

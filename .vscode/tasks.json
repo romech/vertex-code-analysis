@@ -7,7 +7,7 @@
             "label": "Vertex Code Analysis",
             "type": "process",
             "command": "/Users/roman/miniforge3/envs/vertex/bin/python",
-            "args": [ "${workspaceFolder}/demo/cli.py", "${file}"],
+            "args": [ "-m", "vertex_code_analysis.cli", "${file}"],
             "presentation": { "clear": true },
             "problemMatcher": {
               "owner": "vertex",

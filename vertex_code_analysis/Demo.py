@@ -173,8 +173,25 @@ assistant = Assistant()
 
 # PAGE LAYOUT
 
-st.write("# Welcome to Vertex Code Analyser! 👋")
 
+st.markdown(
+"""
+# Welcome to Vertex Code Analyser! 🌴
+
+This is a **static code analysis** tool based on Google PaLM.
+
+### VSCode add-on
+
+We built an IDE extension, so that you can improve your code without referring to a language model explicitly.
+
+You can add it to **VSCode** by checking our [GitHub](https://github.com/romech/vertex-code-analysis).
+""")
+
+with st.expander('See how it looks like'):
+    st.write('Run analysis by activating a hotkey 👉')
+    st.image('assets/vscode_demo.png')
+
+st.markdown('### Try in the browser')
 with st.sidebar:
     st.image('https://developers.google.com/static/focus/images/palm-logo.svg', width=128)
     code_examples = get_code_examples()
@@ -202,7 +219,7 @@ with ai_side:
             key='response')
 
 with editor_side:
-    st.write('Try out your code:')
+    st.write('Your code:')
     user_code = st_ace(value=code_examples[code_example_name],
                        language=language,
                        auto_update=auto_suggest,

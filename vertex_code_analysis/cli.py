@@ -5,7 +5,7 @@ import os
 import sys
 from pathlib import Path
 
-import vertex_model
+import vertex_code_analysis.vertex_model as vertex_model
 
 
 def run_analysis(path: Path):
@@ -45,7 +45,8 @@ def _parse_response(response: list) -> list:
         comments.append((line_num, message))
     return comments
         
-if __name__ == '__main__':
+
+def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('path', type=Path, metavar='script.py',
                         help='Path to .py file')
@@ -54,4 +55,7 @@ if __name__ == '__main__':
         raise FileNotFoundError(f'File {args.path} not found')
     
     run_analysis(args.path)
-    
+
+
+if __name__ == '__main__':
+    main()
