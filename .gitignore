@@ -1,4 +1,5 @@
-service_account.json
+/service_account.json
+/.streamlit/secrets.toml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -30,7 +30,6 @@ def _initialize_credentials(credentials=None):
     vertexai.init(project=project_id, location="us-central1")
 
 
-@cache
 def get_model(credentials=None) -> ChatModel:
     _initialize_credentials(credentials)
     chat_model = ChatModel.from_pretrained("chat-bison")
