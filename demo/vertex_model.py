@@ -20,18 +20,19 @@ PROMPT_PARAMETERS = {
     "top_k": 40,
 }
 
-def _initialize_credentials():
-    service_account_info = json.loads(_CREDENTIALS_JSON.read_text(encoding="utf-8"))
-    project_id = service_account_info["project_id"]
+def _initialize_credentials(credentials=None):
+    if credentials is None:
+        credentials = json.loads(_CREDENTIALS_JSON.read_text(encoding="utf-8"))
+    project_id = credentials["project_id"]
 
-    my_credentials = service_account.Credentials.from_service_account_info(service_account_info)
+    my_credentials = service_account.Credentials.from_service_account_info(credentials)
     aiplatform.init(credentials=my_credentials)
     vertexai.init(project=project_id, location="us-central1")
 
 
 @cache
-def get_model() -> ChatModel:
-    _initialize_credentials()
+def get_model(credentials=None) -> ChatModel:
+    _initialize_credentials(credentials)
     chat_model = ChatModel.from_pretrained("chat-bison")
     return chat_model
 

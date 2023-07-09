@@ -29,7 +29,11 @@ def get_code_examples():
 
 @st.cache_resource
 def get_model():
-    return vertex_model.get_model()
+    if 'vertex' in st.secrets:
+        credentials = dict(st.secrets['vertex'].items())
+    else:
+        credentials = None
+    return vertex_model.get_model(credentials)
 
 
 class Assistant:
