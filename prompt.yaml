@@ -13,7 +13,7 @@ instructions: >
     {
         "code_line_num": [int, which line of code the suggestion is dedicated to]
     
-        "replacement_code": [string; Python code to improve and replace the given line.]
+        "replacement_code": [string; Python code to improve and replace the given line. null value is NOT possible here.]
 
         "explanation": [string, optional; a suggestion that a programmer is supposed to read to improve the code. Preferably one sentence long. Remember to fence quote characters for a valid JSON, or use singular 'quotes'. If the replacement_code is self-explanatory, pass null value here.]
     

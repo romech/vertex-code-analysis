@@ -69,7 +69,7 @@ class Assistant:
         response_struct = chat.send_message(prompt)
         response_text = response_struct.text
         try:
-            response = json.loads(response_text)
+            response = json.loads(response_text, strict=False)
             response = response['suggestions']
             last_response.json(response)
             suggestions = self._parse_response(user_code, response)
