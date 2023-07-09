@@ -19,13 +19,6 @@ st.set_page_config(
     layout="wide",
 )
 
-def update_ai_suggestions(text):
-    with ai_code_placeholder:
-        st_ace(value=text,
-               language=language,
-               readonly=True,
-               auto_update=True)
-
 
 @st.cache_resource
 def get_model():
@@ -137,6 +130,7 @@ class Assistant:
         text, notifications = suggestions
         with ai_code_placeholder:
             st.session_state['last_response'] = text
+            st.session_state['last_notifications'] = notifications
             st_ace(value=text,
                    language=language,
                    readonly=True,
@@ -183,6 +177,7 @@ with ai_side:
             language=language,
             readonly=True,
             auto_update=True,
+            annotations=st.session_state.get('last_notifications', None),
             key='response')
 
 with editor_side:
