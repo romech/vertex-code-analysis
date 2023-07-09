@@ -72,16 +72,18 @@ class Assistant:
             response = json.loads(response_text)
             response = response['suggestions']
             last_response.json(response)
-        except (json.decoder.JSONDecodeError, KeyError):
-            last_response.markdown(f"""
-                                   Invalid JSON response
-                                   ```
-                                   {response_text}
-                                   ```
-                                   """)
+            suggestions = self._parse_response(user_code, response)
+        except:
+            logging.exception('Failed to parse response')
+            last_response.markdown(
+                f"""
+                Failed to parse response. See console output for error details.
+                ```
+                {response_text}
+                ```
+                """.strip('\n'))
             return '...', []
             
-        suggestions = self._parse_response(user_code, response)
         return suggestions
 
     def _parse_response(self, user_code: str, response: dict) -> str:
