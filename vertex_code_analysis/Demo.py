@@ -112,7 +112,7 @@ class Assistant:
                 logging.warning(f'line {line_num} is out of range')
                 last_status.write('Encountered invalid line number')
                 continue
-            suggestion = block.get('replacement_code', '').strip('\n')
+            suggestion = (block.get('replacement_code') or '').strip('\n')
             
             suggestion_lines = suggestion.split('\n')
             # checking if the suggestion is longer than the input
@@ -127,7 +127,7 @@ class Assistant:
             for i, line in enumerate(suggestion_lines, line_num):
                 comments[i] = line
             
-            explanation = block.get('explanation', '').replace('\n',' ')
+            explanation = (block.get('explanation') or '').replace('\n',' ')
             notifications.append({
                 "row": line_num,
                 "column": 0,
